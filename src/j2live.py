@@ -1,4 +1,8 @@
-from nicegui import ui, app
+from multiprocessing import freeze_support
+
+freeze_support()
+
+from nicegui import ui, app, native
 from nicegui.events import ValueChangeEventArguments
 from themes.nord import NordTheme
 
@@ -188,12 +192,12 @@ def JinjaEditor():
         ui.label("Jinja2 Template").classes(
             "text-lg leading-none font-serif tracking-wide"
         )
-        with ui.element("span").classes("text-[#d8dee9] mb-1"):
+        with ui.element("span").classes("text-[#d8dee9]"):
             with ui.element("sup").classes("flex text-xs"):
-                ui.label("e.g.").classes("indent-4")
+                ui.label("e.g.").classes("indent-4 italic")
                 ui.space().classes("w-1")
-                ui.label("{{ some_var }}").classes("font-mono bg-[#2e3440] px-1")
-    container = ui.row().classes(f"w-[40vw] h-full max-h-[80vh] template-preview")
+                ui.label("{{ some_var }}").classes("font-mono bg-[#2e3440] px-1 italic")
+    container = ui.row().classes(f"w-full h-full max-h-[80vh] template-preview")
 
     ui.timer(0, lambda: getMonacoEditor(container.id), once=True)
 
@@ -323,15 +327,19 @@ def TemplatePreview():
         """
         )
 
-    with ui.row().classes("w-full flex flex-col"):
-        ui.label("Generated Template").classes("text-lg leading-none font-serif")
-        with ui.element("span").classes("text-[#d8dee9] -mt-1 mb-1"):
+    with ui.row().classes("w-full flex flex-col justify-end"):
+        ui.label("Generated Template").classes(
+            "text-lg w-full text-end leading-none font-serif"
+        )
+        with ui.element("span").classes(
+            "text-[#d8dee9] -mt-1 mb-1 text-end w-80 self-end"
+        ):
             with ui.element("sup").classes("flex text-xs"):
                 ui.label(
                     "The generated output below will automatically update when tweaking values on the left-hand side"
-                ).classes("indent-4")
+                ).classes("italic")
 
-    container = ui.row().classes(f"w-[40vw] h-full max-h-[88vh] template-preview")
+    container = ui.row().classes(f"w-full h-full max-h-[85.5vh] template-preview")
 
     ui.timer(0, lambda: getMonacoEditor(container.id), once=True)
 
@@ -453,13 +461,13 @@ def YamlEditor():
         ui.label("YAML Variables").classes(
             "text-lg leading-none font-serif tracking-wide"
         )
-        with ui.element("span").classes("text-[#d8dee9] mb-1"):
+        with ui.element("span").classes("text-[#d8dee9]"):
             with ui.element("sup").classes("flex text-xs"):
-                ui.label("e.g.").classes("indent-4")
+                ui.label("e.g.").classes("indent-4 italic")
                 ui.space().classes("w-1")
-                ui.label("some_var: abc").classes("font-mono bg-[#2e3440] px-1")
+                ui.label("some_var: abc").classes("font-mono bg-[#2e3440] px-1 italic")
 
-    container = ui.row().classes(f"w-[40vw] h-full max-h-[88vh] template-preview")
+    container = ui.row().classes(f"w-full h-full max-h-[88vh] yaml-editor")
 
     ui.timer(0, lambda: getMonacoEditor(container.id), once=True)
 
@@ -485,12 +493,12 @@ async def App():
 
     AppBar()
     rootLayout = ui.element().classes(
-        "flex w-full justify-evenly items-stretch antialiased"
+        "flex w-full h-[90v] justify-evenly items-stretch antialiased lg:w-screen"
     )
 
     with rootLayout:
         with ui.element().classes(
-            "basis-5/12 h-[40.5vh] flex items-stretch justify-around"
+            "basis-5/12 h-[40.45vh] flex items-stretch justify-around"
         ):
             yamlEditor = YamlEditor()
             jinjaEditor = JinjaEditor()
@@ -505,6 +513,8 @@ async def App():
 
 
 ui.run(
-    show=False,
+    show=True,
+    reload=True,
     storage_secret=config.storageSecret,
+    port=native.find_open_port(),
 )
