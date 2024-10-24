@@ -513,8 +513,7 @@ async def App():
 
 
 ui.run(
-    show=True,
-    reload=True,
+    show=False,
     storage_secret=config.storageSecret,
     port=native.find_open_port(),
 )
