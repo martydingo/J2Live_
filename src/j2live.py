@@ -3,20 +3,18 @@ from multiprocessing import freeze_support
 freeze_support()
 
 from nicegui import ui, app, native
-from nicegui.events import ValueChangeEventArguments
 
 from components.AppHeader import AppHeader
 from components.Jinja2Editor import Jinja2Editor
 from components.TemplatePreview import TemplatePreview
 from components.YAMLEditor import YAMLEditor
 
-from _ansible import renderTemplate
 from config import storageSecret, siteLogo, globalCss, tailwindCss
 from themes.nord import NordTheme
 
 
 @ui.page(path="/", title="J2Live", favicon=siteLogo.replace("currentColor", "white"))
-async def App():
+async def setupApp():
     ui.dark_mode().enable()
     NordTheme()
     ui.add_css(globalCss)
@@ -34,6 +32,9 @@ async def App():
         local_file="src/assets/MapleMono.ttf", url_path="/assets/MapleMono-Italic.ttf"
     )
 
+
+async def App():
+    setupApp()
     AppHeader()
     rootLayout = ui.element().classes(
         "flex w-full h-[90v] justify-evenly items-stretch antialiased lg:w-screen"
