@@ -14,7 +14,7 @@ from themes.nord import NordTheme
 
 
 @ui.page(path="/", title="J2Live", favicon=siteLogo.replace("currentColor", "white"))
-async def setupApp():
+async def App():
     ui.dark_mode().enable()
     NordTheme()
     ui.add_css(globalCss)
@@ -32,9 +32,6 @@ async def setupApp():
         local_file="src/assets/MapleMono.ttf", url_path="/assets/MapleMono-Italic.ttf"
     )
 
-
-async def App():
-    setupApp()
     AppHeader()
     rootLayout = ui.element().classes(
         "flex w-full h-[90v] justify-evenly items-stretch antialiased lg:w-screen"
