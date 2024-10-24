@@ -13,8 +13,7 @@ from components.Jinja2Editor import Jinja2Editor
 from _ansible import renderTemplate
 from themes.nord import NordTheme
 
-
-monoFontFamily = '"Maple Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace'
+from config import monoFontFamily
 
 logo = """
 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 512 512">
