@@ -4,10 +4,14 @@ freeze_support()
 
 from nicegui import ui, app, native
 from nicegui.events import ValueChangeEventArguments
-from themes.nord import NordTheme
+
+import config
+
+from components.YAMLEditor import YAMLEditor
+from components.Jinja2Editor import Jinja2Editor
 
 from _ansible import renderTemplate
-import config
+from themes.nord import NordTheme
 
 
 monoFontFamily = '"Maple Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace'
@@ -68,138 +72,6 @@ def AppBar():
         ui.markdown("J2Live").classes(
             "text-xl -ml-3 font-serif -mt-1 tracking-widest font-medium"
         )
-
-
-async def handleJinjaEditorChange(eventArgs: ValueChangeEventArguments):
-    app.storage.user["jinjaEditorContent"] = await ui.run_javascript(
-        "window.jinjaEditor.getValue()"
-    )
-    yamlContent = app.storage.user["yamlEditorContent"]
-    try:
-        renderedOutput, hasErrored = renderTemplate(
-            yamlContent, app.storage.user["jinjaEditorContent"]
-        )
-    except Exception as errorMsg:
-        renderedOutput = errorMsg
-
-    app.storage.user["templatePreviewContent"] = renderedOutput
-
-    detectCodeLangResponse = await ui.run_javascript(
-        f"""
-        const flourite = window.flourite;
-        flourite(`{renderedOutput}`);
-        """,
-    )
-
-    app.storage.user["templatePreviewContent"] = renderedOutput
-
-    app.storage.user["templatePreviewLanguage"] = detectCodeLangResponse[
-        "language"
-    ].lower()
-
-    ui.run_javascript(
-        f"""
-        window.templatePreview.setValue(`{renderedOutput}`)
-        monaco.editor.setModelLanguage(window.templatePreview.getModel(), "{app.storage.user["templatePreviewLanguage"]}");
-        """
-    )
-
-
-def JinjaEditor():
-    try:
-        jinjaEditorContent = app.storage.user["jinjaEditorContent"]
-    except KeyError:
-        jinjaEditorContent = ""
-
-    async def getMonacoEditor(divId):
-        try:
-            jinjaEditorContent = app.storage.user["jinjaEditorContent"]
-        except KeyError:
-            jinjaEditorContent = ""
-
-        await ui.run_javascript(
-            f"""
-            function loadScript(url, callback) {{
-                var script = document.createElement("script");
-                script.type = "text/javascript";
-                script.src = url;
-                script.onload = callback;
-                document.body.appendChild(script);
-            }}
-
-            loadScript("https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.0/min/vs/loader.min.js", function() {{
-                require.config({{ paths: {{ 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.0/min/vs' }}}});
-                require(['vs/editor/editor.main'], function() {{
-                
-                    async function jinjaEditor() {{
-                      const {{ createHighlighter }} = await import('https://esm.sh/shiki@1.22.0')
-                      const {{ shikiToMonaco }} = await import('https://esm.sh/@shikijs/monaco@1.22.0')
-
-                      const highlighter = await createHighlighter({{
-                        themes: ['nord'],
-                        langs: [
-                          "jinja",
-                        ]  
-                      }})                    
-
-                      monaco.languages.register({{ id: "jinja" }});
-                      shikiToMonaco(highlighter, monaco)
-                      var parentDiv = getElement("{divId}");
-                      window.jinjaEditor = monaco.editor.create(parentDiv, {{
-                          value: `{jinjaEditorContent}`,
-                          language: "twig",
-                          theme: "nord",
-                          fontFamily: '{monoFontFamily}',
-                          fontSize: 14,
-                          readOnly: false,
-                          lineNumbers: 'on',
-                          minimap: {{ enabled: true }},
-                          glyphMargin: false,    
-                          scrollbar: {{                    
-                              vertical: 'hidden',
-                              horizontal: 'hidden',
-                              useShadows: false
-                          }},
-                          scrollBeyondLastLine: false,
-                          renderLineHighlight: 'none',
-                          hover: {{enabled: false}},
-                          renderLineNumbers: 'off',
-                          hideCursorInOverviewRuler: true, 
-                          overviewRulerLanes: 0,
-                          renderIndentGuides: false,
-                          wordWrap: "on"
-                      }});
-  
-                      var resizeObserver = new ResizeObserver(function(entries) {{
-                          window.jinjaEditor.layout();
-                      }});
-                      resizeObserver.observe(parentDiv);
-  
-                        window.jinjaEditor.getModel().onDidChangeContent((event) => {{
-                        emitEvent("jinjaEditorChange", event)
-                      }})
-                    }}
-  
-                    jinjaEditor()
-                }});
-            }});
-        """
-        )
-
-        ui.on("jinjaEditorChange", lambda e: handleJinjaEditorChange(e))
-
-    with ui.row().classes("w-full flex flex-col mt-6"):
-        ui.label("Jinja2 Template").classes(
-            "text-lg leading-none font-serif tracking-wide"
-        )
-        with ui.element("span").classes("text-[#d8dee9]"):
-            with ui.element("sup").classes("flex text-xs"):
-                ui.label("e.g.").classes("indent-4 italic")
-                ui.space().classes("w-1")
-                ui.label("{{ some_var }}").classes("font-mono bg-[#2e3440] px-1 italic")
-    container = ui.row().classes(f"w-full h-full max-h-[80vh] template-preview")
-
-    ui.timer(0, lambda: getMonacoEditor(container.id), once=True)
 
 
 def TemplatePreview():
@@ -350,7 +222,7 @@ async def handleYamlEditorChange(eventArgs: ValueChangeEventArguments):
     app.storage.user["yamlEditorContent"] = await ui.run_javascript(
         "window.yamlEditor.getValue()"
     )
-    jinjaContent = app.storage.user["jinjaEditorContent"]
+    jinjaContent = app.storage.user["jinja2EditorContent"]
     try:
         renderedOutput, hasErrored = renderTemplate(
             app.storage.user["yamlEditorContent"] or "", jinjaContent
@@ -501,7 +373,7 @@ async def App():
             "basis-5/12 h-[40.45vh] flex items-stretch justify-around"
         ):
             yamlEditor = YamlEditor()
-            jinjaEditor = JinjaEditor()
+            jinja2Editor = Jinja2Editor()
         with ui.element().classes("basis-5/12 justify-center items-center"):
             templatePreview = TemplatePreview()
 
