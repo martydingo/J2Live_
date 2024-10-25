@@ -1,4 +1,5 @@
-FROM python3:latest
+FROM python:3.13
 RUN git clone https://github.com/martydingo/J2Live.git /app
-RUN cd /app && python3 -m venv venv && source venv/bin/activate && pip3 install -r requirements.txt
-ENTRYPOINT [ "executable" ]
+WORKDIR /app
+RUN pip3 install -r requirements.txt
+ENTRYPOINT [ "/app/venv/bin/python3", "/app/src/j2live.py" ]
