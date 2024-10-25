@@ -9,7 +9,7 @@ from components.Jinja2Editor import Jinja2Editor
 from components.TemplatePreview import TemplatePreview
 from components.YAMLEditor import YAMLEditor
 
-from config import storageSecret, siteLogo, globalCss, tailwindCss
+from config import siteLogo, globalCss, tailwindCss
 from themes.nord import NordTheme
 from random import SystemRandom
 from string import ascii_uppercase, digits
@@ -56,7 +56,9 @@ async def App():
             # )
 
 
-customPort = int(getenv("PORT"))
+customPort = getenv("PORT")
+if customPort != None:
+    customPort = int(customPort)
 customStorageSecret = getenv("STORAGE_SECRET")
 
 ui.run(
