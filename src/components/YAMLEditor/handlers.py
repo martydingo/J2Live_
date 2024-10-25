@@ -7,13 +7,15 @@ async def handleYamlEditorChange(eventArgs: ValueChangeEventArguments):
     app.storage.user["yamlEditorContent"] = await ui.run_javascript(
         "window.yamlEditor.getValue()"
     )
-    jinjaContent = app.storage.user["jinjaEditorContent"]
+    jinjaContent = app.storage.user["jinja2EditorContent"]
     try:
         renderedOutput, hasErrored = renderTemplate(
             app.storage.user["yamlEditorContent"] or "", jinjaContent
         )
     except Exception as errorMsg:
         renderedOutput = errorMsg
+
+    app.storage.user["templatePreviewContent"] = renderedOutput
 
     detectCodeLangResponse = await ui.run_javascript(
         f"""
@@ -32,5 +34,3 @@ async def handleYamlEditorChange(eventArgs: ValueChangeEventArguments):
         monaco.editor.setModelLanguage(window.templatePreview.getModel(), "{app.storage.user["templatePreviewLanguage"]}");
         """
     )
-
-    app.storage.user["templatePreviewContent"] = renderedOutput

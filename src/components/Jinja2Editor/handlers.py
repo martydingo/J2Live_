@@ -24,8 +24,6 @@ async def handleJinja2EditorChange(eventArgs: ValueChangeEventArguments):
         """,
     )
 
-    app.storage.user["templatePreviewContent"] = renderedOutput
-
     app.storage.user["templatePreviewLanguage"] = detectCodeLangResponse[
         "language"
     ].lower()
