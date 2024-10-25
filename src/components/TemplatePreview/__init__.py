@@ -139,7 +139,7 @@ def TemplatePreview():
                     "The generated output below will automatically update when tweaking values on the left-hand side"
                 ).classes("italic")
 
-    container = ui.row().classes(f"w-full h-full max-h-[85.5vh] template-preview")
+    container = ui.row().classes(f"w-full h-full max-h-[84.5vh] template-preview")
 
     ui.timer(0, lambda: getMonacoEditor(container.id), once=True)
 

@@ -37,12 +37,12 @@ async def App():
 
     AppHeader()
     rootLayout = ui.element().classes(
-        "flex w-full h-[90v] justify-evenly items-stretch antialiased lg:w-screen"
+        "flex w-full justify-evenly items-stretch antialiased max-h-sm"
     )
 
     with rootLayout:
         with ui.element().classes(
-            "basis-5/12 h-[40.45vh] flex items-stretch justify-around"
+            "basis-5/12 h-[39.45vh] flex items-stretch justify-around"
         ):
             yamlEditor = YAMLEditor()
             jinja2Editor = Jinja2Editor()
@@ -60,10 +60,23 @@ customPort = getenv("PORT")
 if customPort != None:
     customPort = int(customPort)
 customStorageSecret = getenv("STORAGE_SECRET")
+nativeMode = getenv("NATIVE")
 
-ui.run(
-    show=False,
-    storage_secret=customStorageSecret
-    or "".join(SystemRandom().choice(ascii_uppercase + digits) for _ in range(64)),
-    port=customPort or native.find_open_port(),
-)
+if nativeMode == "false":
+    ui.run(
+        show=False,
+        storage_secret=customStorageSecret
+        or "".join(SystemRandom().choice(ascii_uppercase + digits) for _ in range(64)),
+        port=customPort or native.find_open_port(),
+    )
+
+else:
+    ui.run(
+        show=False,
+        storage_secret=customStorageSecret
+        or "".join(SystemRandom().choice(ascii_uppercase + digits) for _ in range(64)),
+        port=customPort or native.find_open_port(),
+        native=True,
+        window_size=(1920, 1080),
+        frameless=True,
+    )
