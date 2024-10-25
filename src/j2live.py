@@ -56,7 +56,7 @@ async def App():
             # )
 
 
-customPort = getenv("PORT")
+customPort = int(getenv("PORT"))
 
 ui.run(
     show=False,
