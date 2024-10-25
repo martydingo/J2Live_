@@ -11,6 +11,9 @@ from components.YAMLEditor import YAMLEditor
 
 from config import storageSecret, siteLogo, globalCss, tailwindCss
 from themes.nord import NordTheme
+from random import SystemRandom
+from string import ascii_uppercase, digits
+from os import getenv
 
 
 @ui.page(path="/", title="J2Live", favicon=siteLogo.replace("currentColor", "white"))
@@ -53,8 +56,12 @@ async def App():
             # )
 
 
+customPort = getenv("PORT")
+
 ui.run(
     show=False,
-    storage_secret=storageSecret,
-    port=native.find_open_port(),
+    storage_secret="".join(
+        SystemRandom().choice(ascii_uppercase + digits) for _ in range(64)
+    ),
+    port=customPort or native.find_open_port(),
 )
