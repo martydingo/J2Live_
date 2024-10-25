@@ -57,11 +57,11 @@ async def App():
 
 
 customPort = int(getenv("PORT"))
+customStorageSecret = getenv("STORAGE_SECRET")
 
 ui.run(
     show=False,
-    storage_secret="".join(
-        SystemRandom().choice(ascii_uppercase + digits) for _ in range(64)
-    ),
+    storage_secret=customStorageSecret
+    or "".join(SystemRandom().choice(ascii_uppercase + digits) for _ in range(64)),
     port=customPort or native.find_open_port(),
 )
