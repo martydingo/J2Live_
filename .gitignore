@@ -4,3 +4,4 @@ src/config.py
 .nicegui
 build
 dist
+J2Live.spec
